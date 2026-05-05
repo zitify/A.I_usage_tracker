@@ -97,6 +97,7 @@ public class GeminiRelayService : IDisposable
 
     private async Task AcceptLoop(CancellationToken ct)
     {
+        string? exitReason = null;
         while (!ct.IsCancellationRequested && _listener?.IsListening == true)
         {
             HttpListenerContext ctx;
@@ -104,16 +105,30 @@ public class GeminiRelayService : IDisposable
             {
                 ctx = await _listener.GetContextAsync().ConfigureAwait(false);
             }
-            catch (ObjectDisposedException) { break; }
-            catch (HttpListenerException) { break; }
+            catch (ObjectDisposedException) { exitReason = "listener disposed"; break; }
+            catch (HttpListenerException ex) { exitReason = $"HttpListenerException(code={ex.ErrorCode}): {ex.Message}"; break; }
             catch (Exception ex)
             {
                 Logger.Warn("GeminiRelay accept error", ex);
+                exitReason = ex.Message;
                 break;
             }
 
             var token = _cts?.Token ?? CancellationToken.None;
             _ = Task.Run(() => HandleAsync(ctx, token));
+        }
+
+        // 비정상 종료(취소·정상 Stop이 아닌 경우)면 좀비 상태 방지를 위해 IsRunning 해제 + 사유 로그
+        if (!ct.IsCancellationRequested && IsRunning)
+        {
+            LastError = exitReason ?? "accept loop exited";
+            Logger.Warn($"GeminiRelay accept loop ended unexpectedly: {LastError}");
+            IsRunning = false;
+            try { _listener?.Close(); } catch { }
+            _listener = null;
+            StartedAt = null;
+            // UI 스레드에 알림 — Dispatcher 사용 (이 메서드는 ThreadPool에서 실행됨)
+            try { System.Windows.Application.Current?.Dispatcher.BeginInvoke(() => StatusChanged?.Invoke()); } catch { }
         }
     }
 

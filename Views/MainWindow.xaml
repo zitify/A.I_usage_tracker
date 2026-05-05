@@ -2167,9 +2167,12 @@
                       HorizontalAlignment="Left" VerticalAlignment="Top"
                       Visibility="Collapsed"/>
 
-        <!-- ═══ IN-APP SETTINGS PAGE OVERLAY ═══ -->
+        <!-- ═══ IN-APP SETTINGS PAGE OVERLAY ═══
+             Panel.ZIndex=10 — MainTabs(1) 위, DogAnimCanvas(20) 아래에서 그려져
+             설정 페이지가 대시보드를 완전히 덮고 강아지는 그 위로 뛰어다닐 수 있게 함. -->
         <views:GeminiRelaySettingsPage x:Name="GeminiRelaySettings"
                                         Grid.Row="1" Grid.RowSpan="2"
+                                        Panel.ZIndex="10"
                                         Visibility="Collapsed"/>
     </Grid>
     </Border>

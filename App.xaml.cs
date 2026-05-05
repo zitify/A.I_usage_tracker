@@ -113,6 +113,16 @@ public partial class App : System.Windows.Application
 
         SetupTray();
         _mainWindow.Show();
+
+        // 사용자 지정 앱 아이콘 적용 (윈도우/작업표시줄/트레이) — 저장된 설정값 기반
+        IconHelper.ApplyToApp(storage.Settings.AppIconPath);
+    }
+
+    /// <summary>설정 다이얼로그에서 호출 — 트레이 아이콘 즉시 갱신.
+    /// (Window/작업표시줄 갱신은 IconHelper.ApplyToApp 가 동시에 처리)</summary>
+    public void UpdateTrayIcon(System.Drawing.Icon icon)
+    {
+        if (_trayIcon != null) _trayIcon.Icon = icon;
     }
 
     private void SetupTray()

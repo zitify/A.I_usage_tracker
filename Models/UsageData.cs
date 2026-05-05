@@ -180,6 +180,13 @@ public class AppSettings
     /// null 일 때만 (구버전 설정 파일에 필드 없음) 4종 전체로 폴백.</summary>
     public List<string> EnabledDogBreeds { get; set; } = new() { "Corgi", "Bichon", "Golden", "Poodle" };
 
+    /// <summary>실행 중 보이는 아이콘 (Window·작업표시줄·트레이)용 사용자 선택 경로.
+    /// null/빈 문자열이면 기본 Assets/icon.ico 사용.
+    /// 'builtin:A' / 'builtin:B' / 'builtin:C' 같은 표기로 빌트인 3개 컨셉 식별.
+    /// 그 외에는 절대 파일 경로 (.ico / .png).
+    /// 주의: Windows 탐색기·시작메뉴의 .exe 아이콘은 빌드 시 PE 리소스에 박혀 변경 불가.</summary>
+    public string? AppIconPath { get; set; }
+
     public IReadOnlyList<string> GetEnabledBreedNames() =>
         EnabledDogBreeds ?? new List<string> { "Corgi", "Bichon", "Golden", "Poodle" };
 

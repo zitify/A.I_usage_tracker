@@ -825,6 +825,12 @@ public partial class MainWindow : Window
         CheckUpdateBtn.IsEnabled = true;
     }
 
+    private void AppIconSettingsBtn_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new AppIconSettingsDialog(_storage) { Owner = this };
+        dlg.ShowDialog();
+    }
+
     private void ThemeToggleBtn_Click(object sender, RoutedEventArgs e)
     {
         var cur = _storage.Settings.Theme ?? "dark";

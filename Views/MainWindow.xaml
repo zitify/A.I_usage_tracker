@@ -105,6 +105,12 @@
                             </StackPanel>
                         </Border>
                     </Popup>
+                    <Button x:Name="AppIconSettingsBtn"
+                            Content="{StaticResource ChromeIconSettings}"
+                            ToolTip="앱 아이콘 설정"
+                            Style="{StaticResource ChromeBtn}"
+                            Click="AppIconSettingsBtn_Click"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
                     <Button x:Name="ThemeToggleBtn"
                             Content="{StaticResource ChromeIconThemeDark}"
                             ToolTip="테마 전환 (다크 ↔ 강아지)"
@@ -170,9 +176,9 @@
                     <RowDefinition Height="Auto"/>   <!-- 0 header -->
                     <RowDefinition Height="Auto"/>   <!-- 1 hero tiles -->
                     <RowDefinition Height="10"/>
-                    <RowDefinition Height="3*"/>     <!-- 3 health -->
+                    <RowDefinition Height="Auto"/>   <!-- 3 health -->
                     <RowDefinition Height="10"/>
-                    <RowDefinition Height="2*"/>     <!-- 5 trend + top models -->
+                    <RowDefinition Height="*"/>      <!-- 5 trend + top models -->
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Margin="0,0,0,10">

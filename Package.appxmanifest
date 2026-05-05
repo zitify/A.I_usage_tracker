@@ -7,7 +7,7 @@
 
   <Identity Name="zitify.AIUsageTracker"
             Publisher="CN=zitify"
-            Version="2.13.22.0"
+            Version="2.13.23.0"
             ProcessorArchitecture="x64" />
 
   <Properties>

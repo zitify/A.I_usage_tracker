@@ -549,11 +549,11 @@
               <Grid Margin="14">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>      <!-- Header -->
-                    <RowDefinition Height="3*"/>        <!-- Hero row -->
+                    <RowDefinition Height="Auto"/>      <!-- Hero row (content-sized — bar + sub-cards) -->
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="2*"/>        <!-- Weekly cards -->
                     <RowDefinition Height="8"/>
-                    <RowDefinition Height="2*"/>        <!-- Delta chart -->
+                    <RowDefinition Height="3*"/>        <!-- Delta chart (확장) -->
                 </Grid.RowDefinitions>
 
         <!-- ═══ HEADER ═══ -->
@@ -593,20 +593,24 @@
                     Style="{StaticResource Btn}" Click="LoginBtn_Click"/>
         </Grid>
 
-        <!-- ═══ HERO ROW: 5-Hour Session + Extra Usage ═══ -->
+        <!-- ═══ HERO ROW: 5-Hour Session + Routine + Extra (3 cards in 1 line) ═══ -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>      <!-- Session (메인) -->
                 <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>      <!-- Routine -->
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="1*"/>      <!-- Extra -->
             </Grid.ColumnDefinitions>
 
-            <!-- 5-Hour Session — single bar: usage fill + time marker overlay -->
+            <!-- 5-Hour Session — single bar: usage fill + time marker overlay + burn pace footer -->
             <Border Grid.Column="0" Style="{StaticResource Card}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>     <!-- 헤더 -->
+                        <RowDefinition Height="Auto"/>     <!-- Big USAGE % + TIME LEFT -->
+                        <RowDefinition Height="Auto"/>     <!-- Bar + 마커 -->
+                        <RowDefinition Height="Auto"/>     <!-- 페이스 인디케이터 / Burn rate -->
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0">
@@ -615,116 +619,116 @@
                                    FontSize="10" Foreground="{StaticResource TxtSub}" HorizontalAlignment="Right"/>
                     </Grid>
 
-                    <Grid Grid.Row="1" VerticalAlignment="Center">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                    <!-- Big numbers row: USAGE % (left) + TIME LEFT (right) -->
+                    <Grid Grid.Row="1" Margin="0,8,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                        <!-- Big numbers row: USAGE % (left) + TIME LEFT (right) -->
-                        <Grid Grid.Row="0" Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom">
+                            <TextBlock Text="USAGE  " FontSize="10" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TxtSub}" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                            <TextBlock x:Name="UsagePctText" Text="0%" FontSize="22"
+                                       FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text=" / session" FontSize="10"
+                                       Foreground="{StaticResource TxtHintBrush}"
+                                       VerticalAlignment="Bottom" Margin="2,0,0,4"/>
+                        </StackPanel>
 
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <TextBlock Text="USAGE  " FontSize="10" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TxtSub}" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
-                                <TextBlock x:Name="UsagePctText" Text="0%" FontSize="22"
-                                           FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
-                                <TextBlock Text=" / session" FontSize="10"
-                                           Foreground="{StaticResource TxtHintBrush}"
-                                           VerticalAlignment="Bottom" Margin="2,0,0,4"/>
-                            </StackPanel>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Bottom">
+                            <Run x:Name="TimeLeftText" Text="--" FontSize="22"
+                                 FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
+                            <Run x:Name="TimeLeftPctText" Text=" left" FontSize="10"
+                                 Foreground="{StaticResource TxtHintBrush}"/>
+                        </TextBlock>
+                    </Grid>
 
-                            <TextBlock Grid.Column="1" VerticalAlignment="Bottom">
-                                <Run x:Name="TimeLeftText" Text="--" FontSize="22"
-                                     FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
-                                <Run x:Name="TimeLeftPctText" Text=" left" FontSize="10"
-                                     Foreground="{StaticResource TxtHintBrush}"/>
-                            </TextBlock>
+                    <!-- Combined bar: usage fill + time marker (flowing) -->
+                    <Grid Grid.Row="2" Height="38" VerticalAlignment="Center" x:Name="SessionBarRoot">
+                        <Grid Height="10" VerticalAlignment="Center">
+                            <Border Background="{StaticResource BorderBrushBase}" CornerRadius="5"/>
+                            <Border x:Name="UsageBar" Background="{StaticResource AccentBrush}" CornerRadius="5"
+                                    HorizontalAlignment="Left" Width="0"/>
                         </Grid>
-
-                        <!-- Combined bar: usage fill + time marker (flowing).
-                             Outer Grid 38px to leave room ABOVE the bar for the marker badge. -->
-                        <Grid Grid.Row="1" Height="38" VerticalAlignment="Center" x:Name="SessionBarRoot">
-                            <Grid Height="10" VerticalAlignment="Center">
-                                <Border Background="{StaticResource BorderBrushBase}" CornerRadius="5"/>
-                                <Border x:Name="UsageBar" Background="{StaticResource AccentBrush}" CornerRadius="5"
-                                        HorizontalAlignment="Left" Width="0"/>
+                        <Canvas x:Name="SessionTimeMarkerCanvas" ClipToBounds="False">
+                            <Grid x:Name="SessionTimeMarker" Canvas.Left="0" Canvas.Top="-3"
+                                  Visibility="Collapsed">
+                                <Rectangle Width="2" Height="26"
+                                           Fill="{DynamicResource AccentBlueBrush}"
+                                           HorizontalAlignment="Center"/>
+                                <Ellipse Width="6" Height="6"
+                                         Fill="{DynamicResource AccentBlueBrush}"
+                                         VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-3,0,0"/>
+                                <Ellipse Width="6" Height="6"
+                                         Fill="{DynamicResource AccentBlueBrush}"
+                                         VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-3"/>
+                                <Border VerticalAlignment="Top" HorizontalAlignment="Center"
+                                        Margin="0,-18,0,0"
+                                        Background="{DynamicResource AccentBlueBrush}"
+                                        CornerRadius="3" Padding="4,1">
+                                    <TextBlock x:Name="SessionTimeMarkerLabel" Text="--%"
+                                               FontSize="9" FontWeight="Bold" Foreground="White"/>
+                                </Border>
                             </Grid>
-                            <Canvas x:Name="SessionTimeMarkerCanvas" ClipToBounds="False">
-                                <Grid x:Name="SessionTimeMarker" Canvas.Left="0" Canvas.Top="-3"
-                                      Visibility="Collapsed">
-                                    <Rectangle Width="2" Height="26"
-                                               Fill="{DynamicResource AccentBlueBrush}"
-                                               HorizontalAlignment="Center"/>
-                                    <Ellipse Width="6" Height="6"
-                                             Fill="{DynamicResource AccentBlueBrush}"
-                                             VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-3,0,0"/>
-                                    <Ellipse Width="6" Height="6"
-                                             Fill="{DynamicResource AccentBlueBrush}"
-                                             VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-3"/>
-                                    <!-- 시간 경과 % 배지 — 마커 라인 상단에 항상 위치 -->
-                                    <Border VerticalAlignment="Top" HorizontalAlignment="Center"
-                                            Margin="0,-18,0,0"
-                                            Background="{DynamicResource AccentBlueBrush}"
-                                            CornerRadius="3" Padding="4,1">
-                                        <TextBlock x:Name="SessionTimeMarkerLabel" Text="--%"
-                                                   FontSize="9" FontWeight="Bold" Foreground="White"/>
-                                    </Border>
-                                </Grid>
-                            </Canvas>
-                        </Grid>
+                        </Canvas>
+                    </Grid>
+
+                    <!-- 페이스 인디케이터: 사용 vs 시간 비교, 예상 종료 % 표시 -->
+                    <Grid Grid.Row="3" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" x:Name="SessionPaceText"
+                                   Text="—"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TxtSubBrush}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" x:Name="SessionBurnText"
+                                   Text="—"
+                                   FontSize="11" Foreground="{StaticResource TxtSubBrush}"
+                                   VerticalAlignment="Center"/>
                     </Grid>
                 </Grid>
             </Border>
 
-            <!-- Right column: Routine (top) + Extra Usage (bottom) -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="6"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <!-- Daily Routine -->
-                <Border Grid.Row="0" x:Name="RoutineCard" Style="{StaticResource Card}">
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="DAILY ROUTINES" Style="{StaticResource Sec}"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="RoutineUsedText" Text="0" Style="{StaticResource Big}"/>
-                            <TextBlock x:Name="RoutineLimitText" Text="/ 0" FontSize="12"
-                                       Foreground="{StaticResource TxtSub}" VerticalAlignment="Bottom" Margin="4,0,0,4"/>
-                        </StackPanel>
-                        <TextBlock x:Name="RoutineResetText" Text="Resets in --"
-                                   FontSize="10" Foreground="{StaticResource TxtSub}" Margin="0,2,0,0"/>
+            <!-- Daily Routine -->
+            <Border Grid.Column="2" x:Name="RoutineCard" Style="{StaticResource Card}">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="DAILY ROUTINES" Style="{StaticResource Sec}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="RoutineUsedText" Text="0" Style="{StaticResource Big}"/>
+                        <TextBlock x:Name="RoutineLimitText" Text="/ 0" FontSize="12"
+                                   Foreground="{StaticResource TxtSub}" VerticalAlignment="Bottom" Margin="4,0,0,4"/>
                     </StackPanel>
-                </Border>
+                    <TextBlock x:Name="RoutineResetText" Text="Resets in --"
+                               FontSize="10" Foreground="{StaticResource TxtSub}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
 
-                <!-- Extra Usage -->
-                <Border Grid.Row="2" x:Name="ExtraCard" Style="{StaticResource Card}">
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="EXTRA USAGE" Style="{StaticResource Sec}"/>
-                        <TextBlock x:Name="ExtraUsedText" Text="$0.00" Style="{StaticResource Big}"/>
-                        <TextBlock x:Name="ExtraLimitText" Text="of $0.00" FontSize="11"
-                                   Foreground="{StaticResource TxtSub}" Margin="0,2,0,8"/>
-                        <Grid Height="6" Margin="0,0,0,6">
-                            <Border Background="{StaticResource BorderBrushBase}" CornerRadius="3"/>
-                            <Border x:Name="ExtraBar" Background="{StaticResource AccentBrush}" CornerRadius="3"
-                                    HorizontalAlignment="Left" Width="0"/>
-                        </Grid>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="ExtraPctText" Text="0%" FontSize="12" FontWeight="Bold"
-                                       Foreground="{StaticResource TxtHighlight}"/>
-                            <TextBlock Text="  Monthly" FontSize="10" Foreground="{StaticResource TxtSub}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock x:Name="ExtraDisabledText" Text="Disabled" FontSize="11"
-                                   Foreground="{DynamicResource AccentRedBrush}" Visibility="Collapsed" Margin="0,4,0,0"/>
+            <!-- Extra Usage -->
+            <Border Grid.Column="4" x:Name="ExtraCard" Style="{StaticResource Card}">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="EXTRA USAGE" Style="{StaticResource Sec}"/>
+                    <TextBlock x:Name="ExtraUsedText" Text="$0.00" Style="{StaticResource Big}"/>
+                    <TextBlock x:Name="ExtraLimitText" Text="of $0.00" FontSize="11"
+                               Foreground="{StaticResource TxtSub}" Margin="0,2,0,8"/>
+                    <Grid Height="6" Margin="0,0,0,6">
+                        <Border Background="{StaticResource BorderBrushBase}" CornerRadius="3"/>
+                        <Border x:Name="ExtraBar" Background="{StaticResource AccentBrush}" CornerRadius="3"
+                                HorizontalAlignment="Left" Width="0"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="ExtraPctText" Text="0%" FontSize="12" FontWeight="Bold"
+                                   Foreground="{StaticResource TxtHighlight}"/>
+                        <TextBlock Text="  Monthly" FontSize="10" Foreground="{StaticResource TxtSub}" VerticalAlignment="Center"/>
                     </StackPanel>
-                </Border>
-            </Grid>
+                    <TextBlock x:Name="ExtraDisabledText" Text="Disabled" FontSize="11"
+                               Foreground="{DynamicResource AccentRedBrush}" Visibility="Collapsed" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
         </Grid>
 
         <!-- ═══ WEEKLY CARDS ═══ -->

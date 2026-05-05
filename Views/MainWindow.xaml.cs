@@ -348,6 +348,8 @@ public partial class MainWindow : Window
             TimeLeftText.Text = "5h 00m";
             TimeLeftPctText.Text = " · 새 세션 시작 (새로고침 중)";
             SessionResetAtLabel.Text = "Resetting...";
+            SessionPaceText.Text = "—";
+            SessionBurnText.Text = "—";
             TimeLeftText.Foreground = BR("AccentBlueBrush");
             return;
         }
@@ -355,12 +357,58 @@ public partial class MainWindow : Window
         var rem = (rst - DateTimeOffset.Now).TotalMilliseconds;
         var elapsedPct = Math.Clamp((SessionTotalMs - rem) / SessionTotalMs * 100, 0, 100);
         var remPct = 100 - elapsedPct;
+        var usagePct = EffectivePct(l.SessionPct, l.SessionResetAt);
 
         SetMarker(SessionTimeMarker, SessionTimeMarkerLabel, SessionTimeMarkerCanvas, l.SessionResetAt, SessionTotalMs);
         TimeLeftText.Text = FmtRemain((long)rem);
         TimeLeftPctText.Text = " left";
         SessionResetAtLabel.Text = $"Resets at {rst.ToLocalTime():ddd HH:mm}";
         TimeLeftText.Foreground = remPct > 30 ? BR("AccentBlueBrush") : remPct > 10 ? BR("StatusWarnBrush") : BR("StatusBadBrush");
+
+        // ── 페이스 인디케이터: 사용 % vs 시간 % 비교 ──
+        // delta > 0  → 시간보다 빠르게 소진 중 (위험)
+        // delta < 0  → 시간보다 느리게 소진 중 (여유)
+        var delta = usagePct - elapsedPct;
+        if (elapsedPct < 1)
+        {
+            SessionPaceText.Text = "🍃 세션 시작";
+            SessionPaceText.Foreground = BR("TxtSubBrush");
+        }
+        else if (delta >= 15)
+        {
+            SessionPaceText.Text = $"🔥 빠른 소진 (+{delta:F0}%p)";
+            SessionPaceText.Foreground = BR("StatusBadBrush");
+        }
+        else if (delta >= 5)
+        {
+            SessionPaceText.Text = $"⚡ 약간 빠름 (+{delta:F0}%p)";
+            SessionPaceText.Foreground = BR("StatusWarnBrush");
+        }
+        else if (delta <= -10)
+        {
+            SessionPaceText.Text = $"🍃 여유 ({delta:F0}%p)";
+            SessionPaceText.Foreground = BR("StatusGoodBrush");
+        }
+        else
+        {
+            SessionPaceText.Text = $"✓ 적정 페이스 ({delta:+0;-0}%p)";
+            SessionPaceText.Foreground = BR("StatusGoodBrush");
+        }
+
+        // ── Burn rate: 현재 페이스가 끝까지 유지되면 종료 시점 사용 % 예측 ──
+        if (elapsedPct >= 1)
+        {
+            var projected = Math.Min(200, usagePct / elapsedPct * 100);
+            SessionBurnText.Text = $"종료시 예상 {projected:F0}%";
+            SessionBurnText.Foreground = projected >= 100 ? BR("StatusBadBrush")
+                                       : projected >= 80  ? BR("StatusWarnBrush")
+                                                          : BR("TxtSubBrush");
+        }
+        else
+        {
+            SessionBurnText.Text = "—";
+            SessionBurnText.Foreground = BR("TxtSubBrush");
+        }
     }
 
     // ────────── Ring ──────────

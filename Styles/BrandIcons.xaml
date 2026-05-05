@@ -1,6 +1,37 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!-- ═══ Relay-popup용 아이콘 — 12×12 viewport. 폰트 폴백 영향 없음. ═══ -->
+    <!-- ⚡ 자동 동작 (번개) -->
+    <Geometry x:Key="RelayIconBolt">M7,0 L1,7 L5,7 L4,12 L11,5 L7,5 Z</Geometry>
+    <!-- 🔄 되돌리기/제거 (시계 반대 회전 화살표) -->
+    <Geometry x:Key="RelayIconRefresh">F0 M6,0 A6,6 0 1 1 0,6 A6,6 0 0 1 6,0 L6,1 A5,5 0 0 0 1,6 A5,5 0 1 0 6,1 Z M5,-1 L9,2 L5,5 Z</Geometry>
+    <!-- 📋 복사 (두 장 겹친 페이지) -->
+    <Geometry x:Key="RelayIconClipboard">F0 M0,3 L8,3 L8,12 L0,12 Z M3,0 L11,0 L11,9 L8,9 L8,3 L3,3 Z</Geometry>
+    <!-- 📡 안테나/릴레이 (중앙 점 + 동심 두 호) -->
+    <Geometry x:Key="RelayIconAntenna">F0 M6,4 A2,2 0 1 0 6,8 A2,2 0 1 0 6,4 Z M2.5,2.5 A5,5 0 0 1 9.5,2.5 L8.5,3.5 A3.5,3.5 0 0 0 3.5,3.5 Z M0.5,0.5 A8,8 0 0 1 11.5,0.5 L10.5,1.5 A6.5,6.5 0 0 0 1.5,1.5 Z</Geometry>
+    <!-- 💻 코드 (브래킷 < / >) -->
+    <Geometry x:Key="RelayIconCode">M4,2 L0,6 L4,10 L4,8.5 L1.5,6 L4,3.5 Z M8,2 L12,6 L8,10 L8,8.5 L10.5,6 L8,3.5 Z</Geometry>
+    <!-- 🎯 타겟 (3단 원) -->
+    <Geometry x:Key="RelayIconTarget">F0 M6,0 A6,6 0 1 0 6,12 A6,6 0 1 0 6,0 Z M6,2.5 A3.5,3.5 0 1 0 6,9.5 A3.5,3.5 0 1 0 6,2.5 Z M6,4.5 A1.5,1.5 0 1 0 6,7.5 A1.5,1.5 0 1 0 6,4.5 Z</Geometry>
+    <!-- 💡 전구 (정보/팁) -->
+    <Geometry x:Key="RelayIconBulb">F0 M6,0 C2.5,0 1,3 3.5,6.5 L4,8.5 L8,8.5 L8.5,6.5 C11,3 9.5,0 6,0 Z M4.5,9.5 L7.5,9.5 L7.5,10.5 L4.5,10.5 Z M5,11.5 L7,11.5 L7,12 L5,12 Z</Geometry>
+
+    <!-- 🤖 톱니/규칙 (cog 단순화) -->
+    <Geometry x:Key="RelayIconRule">F0 M5,0 L7,0 L7,1.5 L9,2.5 L10.5,1 L11.5,2 L10,3.5 L11,5.5 L12,5.5 L12,7.5 L10.5,7.5 L9.5,9.5 L11,11 L10,12 L8.5,10.5 L6.5,11.5 L6.5,12 L4.5,12 L4.5,10.5 L2.5,9.5 L1,11 L0,10 L1.5,8.5 L0.5,6.5 L0,6.5 L0,4.5 L1.5,4.5 L2.5,2.5 L1,1 L2,0 L3.5,1.5 L5,0.5 Z M6,4 A2,2 0 1 0 6,8 A2,2 0 1 0 6,4 Z</Geometry>
+
+    <!-- 버튼 내부 아이콘 공용 스타일: Path Fill 을 부모 Button.Foreground 에 바인딩
+         → 호버 시 Button.Foreground 가 흰색으로 바뀌면 아이콘도 자동 추적 -->
+    <Style x:Key="BtnIconPath" TargetType="Path">
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,6,0"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Fill" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    </Style>
+
     <!-- ═══ Chrome (titlebar) button icons — Geometry vector data, 12×12 viewport ═══
          Path 으로 렌더되어 폰트 폴백(컬러 이모지 등)의 영향을 받지 않고
          Foreground 토큰을 정확히 따른다. -->

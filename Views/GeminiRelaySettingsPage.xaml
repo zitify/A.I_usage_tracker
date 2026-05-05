@@ -55,7 +55,12 @@
                 <Button Grid.Column="0" Content="← 뒤로" Style="{StaticResource BtnGhost}"
                         Click="Back_Click"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="📡 Gemini Local Relay" FontSize="14" FontWeight="SemiBold"
+                    <Path Data="{StaticResource RelayIconAntenna}"
+                          Fill="{DynamicResource TxtHighlightBrush}"
+                          Width="14" Height="14" Stretch="Uniform"
+                          VerticalAlignment="Center" Margin="0,0,8,0"
+                          SnapsToDevicePixels="True"/>
+                    <TextBlock Text="Gemini Local Relay" FontSize="14" FontWeight="SemiBold"
                                Foreground="{StaticResource TxtHighlightBrush}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="SubtitleText" Text="" FontSize="11" Foreground="{StaticResource TxtSubBrush}"
                                Margin="10,0,0,0" VerticalAlignment="Center"/>
@@ -83,8 +88,11 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="💡" FontSize="14" Margin="0,0,8,0"
-                                   VerticalAlignment="Top"/>
+                        <Path Grid.Column="0" Data="{StaticResource RelayIconBulb}"
+                              Fill="{DynamicResource AccentBrush}"
+                              Width="14" Height="14" Stretch="Uniform"
+                              VerticalAlignment="Top" Margin="0,2,8,0"
+                              SnapsToDevicePixels="True"/>
                         <StackPanel Grid.Column="1">
                             <TextBlock FontSize="12" Foreground="{StaticResource TxtBrush}" TextWrapping="Wrap">
                                 <Run FontWeight="SemiBold">동작 방식:</Run>
@@ -117,9 +125,16 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                                   Text="🎯 1단계 · 환경변수 자동 설정" FontSize="13" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentBlueBrush}"/>
+                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                    Orientation="Horizontal">
+                            <Path Data="{StaticResource RelayIconTarget}"
+                                  Fill="{DynamicResource AccentBlueBrush}"
+                                  Width="13" Height="13" Stretch="Uniform"
+                                  VerticalAlignment="Center" Margin="0,0,6,0"
+                                  SnapsToDevicePixels="True"/>
+                            <TextBlock Text="1단계 · 환경변수 자동 설정" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource AccentBlueBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                    FontSize="11" Foreground="{StaticResource TxtSubBrush}" TextWrapping="Wrap"
@@ -135,13 +150,25 @@
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                            <Button x:Name="PrimaryActionBtn" Content="⚡ 자동 설정"
+                            <Button x:Name="PrimaryActionBtn"
                                     Style="{StaticResource BtnPrimary}"
-                                    Click="PrimaryAction_Click" MinWidth="140"/>
-                            <Button x:Name="RevertBtn" Content="🔄 되돌리기"
+                                    Click="PrimaryAction_Click" MinWidth="140">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Style="{StaticResource BtnIconPath}"
+                                          Data="{StaticResource RelayIconBolt}"/>
+                                    <TextBlock x:Name="PrimaryActionLabel" Text="자동 설정" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="RevertBtn"
                                     Style="{StaticResource BtnDanger}"
                                     Click="Revert_Click" MinWidth="120" Margin="8,0,0,0"
-                                    Visibility="Collapsed"/>
+                                    Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Style="{StaticResource BtnIconPath}"
+                                          Data="{StaticResource RelayIconRefresh}"/>
+                                    <TextBlock Text="되돌리기" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
 
                         <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
@@ -166,9 +193,16 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                                   Text="🤖 2단계 · Claude CLI 연동 규칙 설치" FontSize="13" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentBlueBrush}"/>
+                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                    Orientation="Horizontal">
+                            <Path Data="{StaticResource RelayIconRule}"
+                                  Fill="{DynamicResource AccentBlueBrush}"
+                                  Width="13" Height="13" Stretch="Uniform"
+                                  VerticalAlignment="Center" Margin="0,0,6,0"
+                                  SnapsToDevicePixels="True"/>
+                            <TextBlock Text="2단계 · Claude CLI 연동 규칙 설치" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource AccentBlueBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                    FontSize="11" Foreground="{StaticResource TxtSubBrush}" TextWrapping="Wrap"
@@ -186,13 +220,25 @@
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                            <Button x:Name="InstallRuleBtn" Content="⚡ 규칙 설치"
+                            <Button x:Name="InstallRuleBtn"
                                     Style="{StaticResource BtnPrimary}"
-                                    Click="InstallRule_Click" MinWidth="140"/>
-                            <Button x:Name="RemoveRuleBtn" Content="🔄 제거"
+                                    Click="InstallRule_Click" MinWidth="140">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Style="{StaticResource BtnIconPath}"
+                                          Data="{StaticResource RelayIconBolt}"/>
+                                    <TextBlock x:Name="InstallRuleLabel" Text="규칙 설치" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="RemoveRuleBtn"
                                     Style="{StaticResource BtnDanger}"
                                     Click="RemoveRule_Click" MinWidth="120" Margin="8,0,0,0"
-                                    Visibility="Collapsed"/>
+                                    Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Style="{StaticResource BtnIconPath}"
+                                          Data="{StaticResource RelayIconRefresh}"/>
+                                    <TextBlock Text="제거" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
 
                         <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
@@ -210,8 +256,15 @@
 
                     <Expander Margin="0,0,0,10" IsExpanded="False" Foreground="{StaticResource TxtBrush}">
                         <Expander.Header>
-                            <TextBlock Text="📋 수동 설정 스니펫 (자동 설정이 실패하거나 다른 계정에 적용하려면)"
-                                       Style="{StaticResource ExpanderHeaderTB}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource RelayIconClipboard}"
+                                      Fill="{DynamicResource TxtBrush}"
+                                      Width="12" Height="12" Stretch="Uniform"
+                                      VerticalAlignment="Center" Margin="0,0,6,0"
+                                      SnapsToDevicePixels="True"/>
+                                <TextBlock Text="수동 설정 스니펫 (자동 설정이 실패하거나 다른 계정에 적용하려면)"
+                                           Style="{StaticResource ExpanderHeaderTB}"/>
+                            </StackPanel>
                         </Expander.Header>
                         <StackPanel Margin="0,10,0,0">
 
@@ -223,8 +276,14 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="BaseUrlBox" Style="{StaticResource CodeBox}"/>
-                                <Button Grid.Column="2" Content="📋 복사" Style="{StaticResource Btn}"
-                                        Click="CopyBaseUrl_Click" MinWidth="70"/>
+                                <Button Grid.Column="2" Style="{StaticResource Btn}"
+                                        Click="CopyBaseUrl_Click" MinWidth="70">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIconPath}"
+                                              Data="{StaticResource RelayIconClipboard}"/>
+                                        <TextBlock Text="복사" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
 
                             <TextBlock Text="환경변수 · PowerShell (현재 셸 + 영구 한 번에)" Style="{StaticResource SecTitle}"/>
@@ -238,8 +297,14 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="EnvBox" Style="{StaticResource CodeBox}"
                                          Height="150"/>
-                                <Button Grid.Column="2" Content="📋 복사" Style="{StaticResource Btn}"
-                                        Click="CopyEnv_Click" MinWidth="70" VerticalAlignment="Top"/>
+                                <Button Grid.Column="2" Style="{StaticResource Btn}"
+                                        Click="CopyEnv_Click" MinWidth="70" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIconPath}"
+                                              Data="{StaticResource RelayIconClipboard}"/>
+                                        <TextBlock Text="복사" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
 
                             <TextBlock Text="환경변수 · cmd.exe (set + setx 쌍)" Style="{StaticResource SecTitle}"/>
@@ -251,8 +316,14 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="EnvCmdBox" Style="{StaticResource CodeBox}"
                                          Height="130"/>
-                                <Button Grid.Column="2" Content="📋 복사" Style="{StaticResource Btn}"
-                                        Click="CopyEnvCmd_Click" MinWidth="70" VerticalAlignment="Top"/>
+                                <Button Grid.Column="2" Style="{StaticResource Btn}"
+                                        Click="CopyEnvCmd_Click" MinWidth="70" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIconPath}"
+                                              Data="{StaticResource RelayIconClipboard}"/>
+                                        <TextBlock Text="복사" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
 
                         </StackPanel>
@@ -260,8 +331,15 @@
 
                     <Expander Margin="0,0,0,4" IsExpanded="False" Foreground="{StaticResource TxtBrush}">
                         <Expander.Header>
-                            <TextBlock Text="💻 내 코드에서 사용하는 예시 (cURL / Python / Node.js)"
-                                       Style="{StaticResource ExpanderHeaderTB}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource RelayIconCode}"
+                                      Fill="{DynamicResource TxtBrush}"
+                                      Width="12" Height="12" Stretch="Uniform"
+                                      VerticalAlignment="Center" Margin="0,0,6,0"
+                                      SnapsToDevicePixels="True"/>
+                                <TextBlock Text="내 코드에서 사용하는 예시 (cURL / Python / Node.js)"
+                                           Style="{StaticResource ExpanderHeaderTB}"/>
+                            </StackPanel>
                         </Expander.Header>
                         <StackPanel Margin="0,10,0,0">
 
@@ -274,8 +352,14 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="CurlBox" Style="{StaticResource CodeBox}"
                                          Height="90"/>
-                                <Button Grid.Column="2" Content="📋 복사" Style="{StaticResource Btn}"
-                                        Click="CopyCurl_Click" MinWidth="70" VerticalAlignment="Top"/>
+                                <Button Grid.Column="2" Style="{StaticResource Btn}"
+                                        Click="CopyCurl_Click" MinWidth="70" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIconPath}"
+                                              Data="{StaticResource RelayIconClipboard}"/>
+                                        <TextBlock Text="복사" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
 
                             <TextBlock Text="Python (google-generativeai)" Style="{StaticResource SecTitle}"/>
@@ -287,8 +371,14 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="PyLegacyBox" Style="{StaticResource CodeBox}"
                                          Height="130"/>
-                                <Button Grid.Column="2" Content="📋 복사" Style="{StaticResource Btn}"
-                                        Click="CopyPyLegacy_Click" MinWidth="70" VerticalAlignment="Top"/>
+                                <Button Grid.Column="2" Style="{StaticResource Btn}"
+                                        Click="CopyPyLegacy_Click" MinWidth="70" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIconPath}"
+                                              Data="{StaticResource RelayIconClipboard}"/>
+                                        <TextBlock Text="복사" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
 
                             <TextBlock Text="Python (google-genai · 최신 통합 SDK)" Style="{StaticResource SecTitle}"/>
@@ -300,8 +390,14 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="PyNewBox" Style="{StaticResource CodeBox}"
                                          Height="110"/>
-                                <Button Grid.Column="2" Content="📋 복사" Style="{StaticResource Btn}"
-                                        Click="CopyPyNew_Click" MinWidth="70" VerticalAlignment="Top"/>
+                                <Button Grid.Column="2" Style="{StaticResource Btn}"
+                                        Click="CopyPyNew_Click" MinWidth="70" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIconPath}"
+                                              Data="{StaticResource RelayIconClipboard}"/>
+                                        <TextBlock Text="복사" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
 
                             <TextBlock Text="Node.js (@google/generative-ai)" Style="{StaticResource SecTitle}"/>
@@ -313,8 +409,14 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="NodeBox" Style="{StaticResource CodeBox}"
                                          Height="110"/>
-                                <Button Grid.Column="2" Content="📋 복사" Style="{StaticResource Btn}"
-                                        Click="CopyNode_Click" MinWidth="70" VerticalAlignment="Top"/>
+                                <Button Grid.Column="2" Style="{StaticResource Btn}"
+                                        Click="CopyNode_Click" MinWidth="70" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Style="{StaticResource BtnIconPath}"
+                                              Data="{StaticResource RelayIconClipboard}"/>
+                                        <TextBlock Text="복사" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
 
                         </StackPanel>

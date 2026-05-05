@@ -188,7 +188,7 @@ $body = @{contents=@(@{parts=@(@{text=$prompt})})} | ConvertTo-Json -Depth 5 -Co
             RuleStatusBadgeText.Text = "⚪ 미설치";
             RuleStatusBadgeText.Foreground = ThemeBrush.BR("TxtSubBrush");
             InstallRuleBtn.Visibility = Visibility.Visible;
-            InstallRuleBtn.Content = "⚡ 규칙 설치";
+            InstallRuleLabel.Text = "규칙 설치";
             RemoveRuleBtn.Visibility = Visibility.Collapsed;
         }
     }
@@ -301,7 +301,7 @@ $body = @{contents=@(@{parts=@(@{text=$prompt})})} | ConvertTo-Json -Depth 5 -Co
         {
             StatusBadgeText.Text = "⚪ 미적용 — 설정된 환경변수 없음";
             StatusBadgeText.Foreground = ThemeBrush.BR("TxtSubBrush");
-            PrimaryActionBtn.Content = "⚡ 자동 설정";
+            PrimaryActionLabel.Text = "자동 설정";
             PrimaryActionBtn.Visibility = Visibility.Visible;
             RevertBtn.Visibility = Visibility.Collapsed;
         }
@@ -309,7 +309,7 @@ $body = @{contents=@(@{parts=@(@{text=$prompt})})} | ConvertTo-Json -Depth 5 -Co
         {
             StatusBadgeText.Text = $"⚠ 다른 값 감지됨 ({foreign}/{ManagedVars.Length}) — 적용 시 백업 후 교체";
             StatusBadgeText.Foreground = ThemeBrush.BR("StatusWarnBrush");
-            PrimaryActionBtn.Content = "⚡ 백업 후 자동 설정";
+            PrimaryActionLabel.Text = "백업 후 자동 설정";
             PrimaryActionBtn.Visibility = Visibility.Visible;
             RevertBtn.Visibility = foreign == 0 ? Visibility.Collapsed : Visibility.Visible;
         }
@@ -317,7 +317,7 @@ $body = @{contents=@(@{parts=@(@{text=$prompt})})} | ConvertTo-Json -Depth 5 -Co
         {
             StatusBadgeText.Text = $"⚠ 부분 적용 ({match}/{ManagedVars.Length})";
             StatusBadgeText.Foreground = ThemeBrush.BR("StatusWarnBrush");
-            PrimaryActionBtn.Content = "⚡ 마저 적용하기";
+            PrimaryActionLabel.Text = "마저 적용하기";
             PrimaryActionBtn.Visibility = Visibility.Visible;
             RevertBtn.Visibility = Visibility.Visible;
         }

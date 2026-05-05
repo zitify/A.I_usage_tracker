@@ -10,10 +10,10 @@
     <AssemblyName>AI_usage_tracker</AssemblyName>
     <RootNamespace>AIUsageTracker</RootNamespace>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>2.13.34</Version>
-    <AssemblyVersion>2.13.34.0</AssemblyVersion>
-    <FileVersion>2.13.34.0</FileVersion>
-    <InformationalVersion>2.13.34</InformationalVersion>
+    <Version>2.13.35</Version>
+    <AssemblyVersion>2.13.35.0</AssemblyVersion>
+    <FileVersion>2.13.35.0</FileVersion>
+    <InformationalVersion>2.13.35</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>

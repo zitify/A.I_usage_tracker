@@ -1256,17 +1256,17 @@
                         <!-- Usage summary cards -->
                         <Grid Grid.Row="2">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>   <!-- 0 LOCAL RELAY (entry point — must be running for tracking) -->
                                 <RowDefinition Height="8"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>   <!-- 2 Summary -->
                                 <RowDefinition Height="8"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>   <!-- 4 Cost by account -->
                                 <RowDefinition Height="8"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>      <!-- 6 Recent usage -->
                             </Grid.RowDefinitions>
 
                             <!-- Summary row -->
-                            <Grid Grid.Row="0">
+                            <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="8"/>
@@ -1307,7 +1307,7 @@
                             </Grid>
 
                             <!-- Accounts comparison (today cost) -->
-                            <Border Grid.Row="2" Style="{StaticResource Card}">
+                            <Border Grid.Row="4" Style="{StaticResource Card}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -1347,8 +1347,8 @@
                                 </Grid>
                             </Border>
 
-                            <!-- Local Relay -->
-                            <Border Grid.Row="4" Style="{StaticResource Card}">
+                            <!-- Local Relay (moved to top — entry point for tracking) -->
+                            <Border Grid.Row="0" Style="{StaticResource Card}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>     <!-- 0 헤더 -->

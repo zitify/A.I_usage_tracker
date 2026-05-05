@@ -62,38 +62,37 @@
                                Visibility="Collapsed"/>
                 </StackPanel>
 
-                <!-- 헤더 5개 버튼: 단색 텍스트 글리프 + Foreground 명시
-                     (이모지는 OS 기본 색상이라 테마 색이 적용되지 않으므로 사용 안 함).
-                     강아지 모드 아이보리(#F5E6C8) / 다크 모드 라이트그레이(#CCCCCC) 로 일관 표시. -->
+                <!-- 헤더 5개 버튼: Path/Geometry 기반 렌더링 (BrandIcons.xaml 의 ChromeIcon* 리소스).
+                     글꼴 폴백(컬러 이모지) 영향이 원천 차단되어 Foreground 토큰을 정확히 따름. -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Button x:Name="ThemeToggleBtn" Content="◐" ToolTip="테마 전환 (다크 ↔ 강아지)"
+                    <Button x:Name="ThemeToggleBtn"
+                            Content="{StaticResource ChromeIconThemeDark}"
+                            ToolTip="테마 전환 (다크 ↔ 강아지)"
                             Style="{StaticResource ChromeBtn}"
-                            Foreground="{DynamicResource TitleBarTextBrush}"
-                            FontSize="16"
                             Click="ThemeToggleBtn_Click"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-                    <Button x:Name="TopMostBtn" Content="⌃" ToolTip="항상 위에 고정 (전역)"
+                    <Button x:Name="TopMostBtn"
+                            Content="{StaticResource ChromeIconTopmost}"
+                            ToolTip="항상 위에 고정 (전역)"
                             Style="{StaticResource ChromeBtn}"
-                            Foreground="{DynamicResource TitleBarTextBrush}"
-                            FontSize="18" FontWeight="Bold"
                             Click="TopMostBtn_Click"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-                    <Button x:Name="MinBtn" Content="—" ToolTip="최소화"
+                    <Button x:Name="MinBtn"
+                            Content="{StaticResource ChromeIconMin}"
+                            ToolTip="최소화"
                             Style="{StaticResource ChromeBtn}"
-                            Foreground="{DynamicResource TitleBarTextBrush}"
-                            FontSize="14"
                             Click="MinBtn_Click"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-                    <Button x:Name="MaxBtn" Content="☐" ToolTip="최대화"
+                    <Button x:Name="MaxBtn"
+                            Content="{StaticResource ChromeIconMax}"
+                            ToolTip="최대화"
                             Style="{StaticResource ChromeBtn}"
-                            Foreground="{DynamicResource TitleBarTextBrush}"
-                            FontSize="13"
                             Click="MaxBtn_Click"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-                    <Button x:Name="CloseBtn" Content="✕" ToolTip="닫기"
+                    <Button x:Name="CloseBtn"
+                            Content="{StaticResource ChromeIconClose}"
+                            ToolTip="닫기"
                             Style="{StaticResource ChromeCloseBtn}"
-                            Foreground="{DynamicResource TitleBarTextBrush}"
-                            FontSize="13"
                             Click="CloseBtn_Click"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
                 </StackPanel>

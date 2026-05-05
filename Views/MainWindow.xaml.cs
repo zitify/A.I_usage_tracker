@@ -134,8 +134,8 @@ public partial class MainWindow : Window
         VersionLabel.Text = $"v{UpdateService.CurrentVersion}";
 
         bool isDog = (_storage.Settings.Theme ?? "dark") == "dog";
-        // 테마 토글: 단색 반원 글리프 (◐). 강아지 모드에서는 회전된 반원으로 시각 차이 표현.
-        ThemeToggleBtn.Content = isDog ? "◑" : "◐";
+        // 테마 토글: Path Geometry 리소스 사용 (BrandIcons.xaml). 다크=좌반원, 강아지=우반원.
+        ThemeToggleBtn.Content = TryFindResource(isDog ? "ChromeIconThemeDog" : "ChromeIconThemeDark");
         ApplyDogDecorations(isDog);
     }
 
@@ -765,7 +765,7 @@ public partial class MainWindow : Window
         var next = cur == "dog" ? "dark" : "dog";
         _storage.Settings.Theme = next;
         _storage.SaveSettings(_storage.Settings);
-        ThemeToggleBtn.Content = next == "dog" ? "◑" : "◐";
+        ThemeToggleBtn.Content = TryFindResource(next == "dog" ? "ChromeIconThemeDog" : "ChromeIconThemeDark");
         System.Windows.MessageBox.Show("테마가 변경되었습니다.\n다음 실행 시 적용됩니다.",
                         "테마 변경", MessageBoxButton.OK, MessageBoxImage.Information);
     }

@@ -712,26 +712,32 @@
         <Setter Property="Foreground" Value="{StaticResource TxtHighlightBrush}"/>
     </Style>
 
+    <!-- Chrome (titlebar) 버튼 — Path 기반 렌더링.
+         Foreground 는 DynamicResource 로 두어 런타임 테마 전환에 응답.
+         Content 에는 Geometry 리소스(BrandIcons.xaml 의 ChromeIcon* 키)를 넣음. -->
     <Style x:Key="ChromeBtn" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource TitleBarTextBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TitleBarTextBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Width" Value="46"/>
         <Setter Property="Height" Value="36"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="bd" Background="{TemplateBinding Background}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        <Path x:Name="icon"
+                              Data="{TemplateBinding Content}"
+                              Fill="{TemplateBinding Foreground}"
+                              Width="12" Height="12"
+                              Stretch="Uniform"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              SnapsToDevicePixels="True"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="bd" Property="Background" Value="{StaticResource BgHoverBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource TxtHighlightBrush}"/>
+                            <Setter TargetName="bd"   Property="Background" Value="{DynamicResource BgHoverBrush}"/>
+                            <Setter TargetName="icon" Property="Fill"       Value="{DynamicResource TxtHighlightBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -744,14 +750,18 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="bd" Background="{TemplateBinding Background}">
-                        <!-- TextElement.Foreground 바인딩 — 빠지면 ✕ 가 Window 기본 TxtBrush 로 떨어짐 -->
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        <Path x:Name="icon"
+                              Data="{TemplateBinding Content}"
+                              Fill="{TemplateBinding Foreground}"
+                              Width="12" Height="12"
+                              Stretch="Uniform"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              SnapsToDevicePixels="True"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="bd" Property="Background" Value="#c42b1c"/>
-                            <Setter Property="Foreground" Value="#ffffff"/>
+                            <Setter TargetName="bd"   Property="Background" Value="#c42b1c"/>
+                            <Setter TargetName="icon" Property="Fill"       Value="#FFFFFF"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

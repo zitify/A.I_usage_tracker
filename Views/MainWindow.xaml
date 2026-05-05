@@ -634,8 +634,9 @@
                                    FontSize="10" Foreground="{StaticResource TxtSub}" HorizontalAlignment="Right"/>
                     </Grid>
 
-                    <!-- Big numbers row: USAGE % (left) + TIME LEFT (right) -->
-                    <Grid Grid.Row="1" Margin="0,8,0,8">
+                    <!-- Big numbers row: USAGE % (left) + TIME LEFT (right).
+                         Bottom margin 26 = 마커 배지가 바 위로 21px 떠 있어서 큰 숫자와 겹치지 않도록 확보 -->
+                    <Grid Grid.Row="1" Margin="0,8,0,26">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -766,8 +767,9 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="WEEKLY · ALL MODELS" Style="{StaticResource Sec}"/>
+                    <!-- 큰 숫자 아래 24px = 시간 마커 배지(바 위 21px) 와 겹치지 않게 -->
                     <TextBlock Grid.Row="1" x:Name="WeekAllPctText" Text="0%" Style="{StaticResource Big}"
-                               Margin="0,0,0,8"/>
+                               Margin="0,0,0,24"/>
                     <!-- 마커 라벨이 위로 18px 떠 있어야 하므로 행 높이 30 으로 확보 -->
                     <Grid Grid.Row="2" Height="30" VerticalAlignment="Center" Margin="0,0,0,6">
                         <Grid Height="6" VerticalAlignment="Center">
@@ -811,7 +813,7 @@
                     <TextBlock Grid.Row="0" x:Name="SubModelTitle" Text="WEEKLY · SONNET"
                                Style="{StaticResource Sec}"/>
                     <TextBlock Grid.Row="1" x:Name="SubPctText" Text="0%" Style="{StaticResource Big}"
-                               Margin="0,0,0,8"/>
+                               Margin="0,0,0,24"/>
                     <Grid Grid.Row="2" Height="30" VerticalAlignment="Center" Margin="0,0,0,6">
                         <Grid Height="6" VerticalAlignment="Center">
                             <Border Background="{StaticResource BorderBrushBase}" CornerRadius="3"/>
@@ -853,7 +855,7 @@
                     <TextBlock Grid.Row="0" Text="WEEKLY · CLAUDE DESIGN"
                                Style="{StaticResource Sec}"/>
                     <TextBlock Grid.Row="1" x:Name="DesignPctText" Text="0%" Style="{StaticResource Big}"
-                               Margin="0,0,0,8"/>
+                               Margin="0,0,0,24"/>
                     <Grid Grid.Row="2" Height="30" VerticalAlignment="Center" Margin="0,0,0,6">
                         <Grid Height="6" VerticalAlignment="Center">
                             <Border Background="{StaticResource BorderBrushBase}" CornerRadius="3"/>

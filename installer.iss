@@ -1,20 +1,22 @@
 [Setup]
 AppId={{B8F3A2E1-4C5D-6E7F-8A9B-0C1D2E3F4A5B}
 AppName=A.I. Usage Tracker
-AppVersion=2.13.36
-AppVerName=A.I. Usage Tracker 2.13.36
+AppVersion=2.13.37
+AppVerName=A.I. Usage Tracker 2.13.37
 AppPublisher=zitify
 AppPublisherURL=https://zitify.co.kr
 DefaultDirName={autopf}\AI_usage_tracker
 DefaultGroupName=A.I. Usage Tracker
 OutputDir=installer_output
-OutputBaseFilename=AI_usage_tracker_Setup_v2.13.36
+OutputBaseFilename=AI_usage_tracker_Setup_v2.13.37
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayName=A.I. Usage Tracker
+UninstallDisplayIcon={app}\AI_usage_tracker.exe
+SetupIconFile=Assets\icon.ico
 SetupLogging=yes
 CloseApplications=yes
 CloseApplicationsFilter=*AI_usage_tracker*

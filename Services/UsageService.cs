@@ -25,7 +25,9 @@ public class UsageService
     public static double ToPercent(double v)
     {
         if (double.IsNaN(v)) return 0;
-        if (v >= 0 && v <= 1) return v * 100;
+        // Claude /usage API returns utilization already in percent (0-100).
+        // Past code multiplied by 100 when v<=1 to handle a hypothetical fraction
+        // payload — but that misfires on real values like 1.0 (=1%, becomes 100%).
         return v;
     }
 

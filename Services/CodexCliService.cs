@@ -33,13 +33,33 @@ public class CodexCliService
         public string CostDisplay => $"${Cost:F4}";
     }
 
+    public class CodexSessionRow
+    {
+        public string Status { get; set; } = "";          // 활성 / 종료 / 오류
+        public string StatusToken { get; set; } = "good"; // good / warn / high / bad
+        public string Project { get; set; } = "";          // cwd basename
+        public string Task { get; set; } = "";             // 첫 user 메시지 발췌
+        public DateTime LastWriteLocal { get; set; }
+        public string LastDisplay { get; set; } = "";      // 5m / 2h / 어제 / Mon
+        public long Tokens { get; set; }
+        public string TokenDisplay => Tokens >= 1000 ? $"{Tokens / 1000.0:F1}k" : Tokens.ToString("N0");
+        public string Model { get; set; } = "";
+        public double Cost { get; set; }
+    }
+
     public class CodexSummary
     {
         public List<CodexModelRow> Models { get; set; } = new();
+        public List<CodexSessionRow> Sessions { get; set; } = new();
         public int SessionsTotal { get; set; }
         public long InputTotal { get; set; }
         public long OutputTotal { get; set; }
         public double CostTotal { get; set; }
+
+        // Phase 2 신규
+        public long TodayTokens { get; set; }
+        public long Last7dAvgTokens { get; set; }
+        public int[] HourlyTokens { get; set; } = new int[12]; // 최근 12시간 버킷 (오래된→최신)
     }
 
     public CodexSummary Aggregate(DateTimeOffset since)
@@ -47,32 +67,78 @@ public class CodexCliService
         var summary = new CodexSummary();
         if (!Directory.Exists(SessionsDir)) return summary;
 
-        var sinceMs = since.ToUnixTimeMilliseconds();
         var perModel = new Dictionary<string, CodexModelRow>();
         var sessionFiles = 0;
+        var nowLocal = DateTime.Now;
+        var todayStart = nowLocal.Date;
+        var sevenDaysAgo = todayStart.AddDays(-7);
+        var twelveHoursAgo = nowLocal.AddHours(-12);
+
+        long todayTokens = 0;
+        long last7dTokensExclToday = 0;
+        var hourly = new long[12];
 
         foreach (var path in EnumerateSessionFiles(SessionsDir))
         {
             try
             {
                 var fi = new FileInfo(path);
+                var lastWriteLocal = fi.LastWriteTime;
                 if (fi.LastWriteTimeUtc < since.UtcDateTime) continue;
 
-                var (touched, model, inT, outT, cached) = ParseFile(path);
-                if (!touched) continue;
+                var parsed = ParseFile(path);
+                if (!parsed.touched) continue;
 
                 sessionFiles++;
-                var key = string.IsNullOrEmpty(model) ? "unknown" : model;
+                var key = string.IsNullOrEmpty(parsed.model) ? "unknown" : parsed.model;
                 if (!perModel.TryGetValue(key, out var row))
                 {
                     row = new CodexModelRow { Model = key };
                     perModel[key] = row;
                 }
                 row.Sessions++;
-                row.Input += inT;
-                row.Output += outT;
-                row.Cached += cached;
-                row.Cost += OpenAiPricing.CalculateCost(key, inT, outT, cached);
+                row.Input += parsed.input;
+                row.Output += parsed.output;
+                row.Cached += parsed.cached;
+                var sessionCost = OpenAiPricing.CalculateCost(key, parsed.input, parsed.output, parsed.cached);
+                row.Cost += sessionCost;
+
+                var totalTokens = parsed.input + parsed.output;
+
+                // 오늘 / 7일 평균
+                if (lastWriteLocal >= todayStart)
+                    todayTokens += totalTokens;
+                else if (lastWriteLocal >= sevenDaysAgo)
+                    last7dTokensExclToday += totalTokens;
+
+                // 12h 히스토그램 (1시간 버킷)
+                if (lastWriteLocal >= twelveHoursAgo)
+                {
+                    var hoursAgo = (int)Math.Floor((nowLocal - lastWriteLocal).TotalHours);
+                    var bucket = 11 - Math.Clamp(hoursAgo, 0, 11); // 오래된 → 0, 최신 → 11
+                    hourly[bucket] += totalTokens;
+                }
+
+                // 세션 행 누적
+                var minutesIdle = (nowLocal - lastWriteLocal).TotalMinutes;
+                string status;
+                string statusToken;
+                if (minutesIdle < 5)         { status = "활성";   statusToken = "good"; }
+                else if (minutesIdle < 60)   { status = "최근";   statusToken = "warn"; }
+                else                          { status = "종료";   statusToken = "high"; }
+
+                summary.Sessions.Add(new CodexSessionRow
+                {
+                    Status = status,
+                    StatusToken = statusToken,
+                    Project = parsed.project,
+                    Task = parsed.task,
+                    LastWriteLocal = lastWriteLocal,
+                    LastDisplay = FormatRelative(nowLocal, lastWriteLocal),
+                    Tokens = totalTokens,
+                    Model = parsed.model,
+                    Cost = sessionCost,
+                });
             }
             catch (Exception ex)
             {
@@ -81,11 +147,30 @@ public class CodexCliService
         }
 
         summary.Models = perModel.Values.OrderByDescending(r => r.Cost).ToList();
+        summary.Sessions = summary.Sessions
+            .OrderByDescending(s => s.LastWriteLocal)
+            .Take(20)
+            .ToList();
         summary.SessionsTotal = sessionFiles;
         summary.InputTotal = summary.Models.Sum(r => r.Input);
         summary.OutputTotal = summary.Models.Sum(r => r.Output);
         summary.CostTotal = summary.Models.Sum(r => r.Cost);
+        summary.TodayTokens = todayTokens;
+        summary.Last7dAvgTokens = last7dTokensExclToday / 7;
+        for (int i = 0; i < 12; i++)
+            summary.HourlyTokens[i] = (int)Math.Min(int.MaxValue, hourly[i]);
         return summary;
+    }
+
+    private static string FormatRelative(DateTime now, DateTime then)
+    {
+        var diff = now - then;
+        if (diff.TotalMinutes < 1) return "방금";
+        if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}m";
+        if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}h";
+        if (diff.TotalDays < 2) return "어제";
+        if (diff.TotalDays < 7) return $"{(int)diff.TotalDays}일";
+        return then.ToString("MM/dd");
     }
 
     private static IEnumerable<string> EnumerateSessionFiles(string dir)
@@ -95,10 +180,13 @@ public class CodexCliService
         return Directory.EnumerateFiles(dir, "rollout-*.jsonl", SearchOption.AllDirectories);
     }
 
-    private static (bool touched, string model, long input, long output, long cached)
-        ParseFile(string path)
+    private record ParseResult(bool touched, string model, long input, long output, long cached, string project, string task);
+
+    private static ParseResult ParseFile(string path)
     {
         string model = "";
+        string project = "";
+        string task = "";
         long input = 0, output = 0, cached = 0;
         bool hasTotalUsage = false;  // true = new format found; don't accumulate legacy lines
 
@@ -130,6 +218,36 @@ public class CodexCliService
                     }
                 }
 
+                // cwd → project basename
+                if (string.IsNullOrEmpty(project))
+                {
+                    var cwd = FindString(root, "cwd");
+                    if (string.IsNullOrEmpty(cwd) && root.TryGetProperty("payload", out var pCwd))
+                        cwd = FindString(pCwd, "cwd");
+                    if (!string.IsNullOrEmpty(cwd))
+                    {
+                        try { project = new DirectoryInfo(cwd).Name; }
+                        catch { project = cwd; }
+                    }
+                }
+
+                // 첫 user 메시지 → task 발췌
+                if (string.IsNullOrEmpty(task) &&
+                    root.TryGetProperty("payload", out var pTask) &&
+                    pTask.ValueKind == JsonValueKind.Object)
+                {
+                    var role = FindString(pTask, "role");
+                    if (role == "user")
+                    {
+                        var text = ExtractFirstText(pTask);
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            text = text.Trim().Replace('\n', ' ').Replace('\r', ' ');
+                            task = text.Length > 60 ? text.Substring(0, 60) + "…" : text;
+                        }
+                    }
+                }
+
                 // New Codex CLI format (v0.128+):
                 //   { "type": "event_msg", "payload": { "type": "token_count",
                 //     "info": { "total_token_usage": { "input_tokens": N, ... } } } }
@@ -143,7 +261,6 @@ public class CodexCliService
                 {
                     input  = FindLong(ttu, "input_tokens", "prompt_tokens");
                     output = FindLong(ttu, "output_tokens", "completion_tokens");
-                    // cached_input_tokens is Codex v0.128+; older names kept for safety
                     cached = FindLong(ttu, "cached_input_tokens", "input_cached_tokens", "cached_tokens");
                     hasTotalUsage = true;
                     continue;
@@ -166,7 +283,31 @@ public class CodexCliService
             catch (JsonException) { /* skip malformed line */ }
         }
         bool touched = hasTotalUsage || input > 0 || output > 0;
-        return (touched, model, input, output, cached);
+        return new ParseResult(touched, model, input, output, cached, project, task);
+    }
+
+    private static string ExtractFirstText(JsonElement payload)
+    {
+        // content can be a string or an array of {type, text}
+        if (payload.TryGetProperty("content", out var content))
+        {
+            if (content.ValueKind == JsonValueKind.String)
+                return content.GetString() ?? "";
+            if (content.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in content.EnumerateArray())
+                {
+                    if (item.ValueKind == JsonValueKind.String)
+                        return item.GetString() ?? "";
+                    if (item.ValueKind == JsonValueKind.Object)
+                    {
+                        var t = FindString(item, "text");
+                        if (!string.IsNullOrEmpty(t)) return t;
+                    }
+                }
+            }
+        }
+        return FindString(payload, "text");
     }
 
     private static string FindString(JsonElement el, params string[] names)

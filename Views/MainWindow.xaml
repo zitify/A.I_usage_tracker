@@ -1730,9 +1730,14 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
+                            <!-- ── 4-KPI 카드 ── -->
                             <Border Grid.Row="0" Style="{StaticResource Card}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -1744,31 +1749,183 @@
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="SESSIONS" Style="{StaticResource Sec}"/>
                                         <TextBlock x:Name="CodexSessionsCount" Text="0"
-                                                   FontSize="20" FontWeight="Bold"
+                                                   FontSize="28" FontWeight="Bold"
                                                    Foreground="{StaticResource TxtHighlight}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="INPUT TOKENS" Style="{StaticResource Sec}"/>
                                         <TextBlock x:Name="CodexInputTokens" Text="0"
-                                                   FontSize="20" FontWeight="Bold"
+                                                   FontSize="28" FontWeight="Bold"
                                                    Foreground="{StaticResource TxtHighlight}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="2">
                                         <TextBlock Text="OUTPUT TOKENS" Style="{StaticResource Sec}"/>
                                         <TextBlock x:Name="CodexOutputTokens" Text="0"
-                                                   FontSize="20" FontWeight="Bold"
+                                                   FontSize="28" FontWeight="Bold"
                                                    Foreground="{StaticResource TxtHighlight}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="3">
                                         <TextBlock Text="EST. COST" Style="{StaticResource Sec}"/>
                                         <TextBlock x:Name="CodexEstCost" Text="$0.00"
-                                                   FontSize="20" FontWeight="Bold"
+                                                   FontSize="28" FontWeight="Bold"
                                                    Foreground="{StaticResource TxtHighlight}"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
 
-                            <Border Grid.Row="2" Style="{StaticResource Card}">
+                            <!-- ── LOCAL USAGE + SESSIONS 2-단 ── -->
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="280"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- LOCAL USAGE 카드 -->
+                                <Border Grid.Column="0" Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <TextBlock Text="LOCAL USAGE" Style="{StaticResource Sec}"
+                                                   Margin="0,0,0,10"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="오늘" FontSize="10"
+                                                           Foreground="{StaticResource TxtSubBrush}"/>
+                                                <TextBlock x:Name="CodexLocalToday" Text="0"
+                                                           FontSize="22" FontWeight="Bold"
+                                                           Foreground="{StaticResource TxtHighlight}"/>
+                                                <TextBlock Text="토큰 추적됨" FontSize="10"
+                                                           Foreground="{StaticResource TxtSubBrush}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="지난 7일 평균" FontSize="10"
+                                                           Foreground="{StaticResource TxtSubBrush}"/>
+                                                <TextBlock x:Name="CodexLocalAvg" Text="0"
+                                                           FontSize="22" FontWeight="Bold"
+                                                           Foreground="{StaticResource TxtHighlight}"/>
+                                                <TextBlock x:Name="CodexLocalDelta" Text=""
+                                                           FontSize="10" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource StatusGoodBrush}"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Grid Margin="0,12,0,4" Height="6">
+                                            <Border CornerRadius="3"
+                                                    Background="{StaticResource BgInputBrush}"/>
+                                            <Border x:Name="CodexLocalBar" CornerRadius="3"
+                                                    Background="{StaticResource StatusGoodBrush}"
+                                                    HorizontalAlignment="Left" Width="0"/>
+                                        </Grid>
+                                        <TextBlock x:Name="CodexLocalPercent" Text="0%"
+                                                   FontSize="10" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TxtSubBrush}"
+                                                   HorizontalAlignment="Right" Margin="0,0,0,8"/>
+
+                                        <TextBlock Text="출처: 로컬 로그" FontSize="10"
+                                                   Foreground="{StaticResource TxtSubBrush}"/>
+                                        <TextBlock Text="할당량 정보 없음" FontSize="10"
+                                                   Foreground="{StaticResource TxtSubBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- SESSIONS 테이블 -->
+                                <Border Grid.Column="2" Style="{StaticResource Card}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="SESSIONS" Style="{StaticResource Sec}"
+                                                   Margin="0,0,0,8"/>
+                                        <DataGrid Grid.Row="1" x:Name="CodexSessionGrid"
+                                                  AutoGenerateColumns="False"
+                                                  IsReadOnly="True" HeadersVisibility="Column"
+                                                  GridLinesVisibility="Horizontal"
+                                                  Background="Transparent" BorderThickness="0" RowBackground="Transparent"
+                                                  CanUserAddRows="False" CanUserDeleteRows="False"
+                                                  CanUserResizeRows="False"
+                                                  MaxHeight="220">
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn Header="STATUS" Width="80">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Border CornerRadius="10" Padding="8,2"
+                                                                    HorizontalAlignment="Left"
+                                                                    VerticalAlignment="Center"
+                                                                    Background="{Binding StatusToken, Converter={StaticResource StatusTokenToBgConverter}}">
+                                                                <TextBlock Text="{Binding Status}" FontSize="10"
+                                                                           FontWeight="SemiBold"
+                                                                           Foreground="{Binding StatusToken, Converter={StaticResource StatusTokenToFgConverter}}"/>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="PROJECT" Binding="{Binding Project}" Width="120"/>
+                                                <DataGridTextColumn Header="TASK" Binding="{Binding Task}" Width="*"/>
+                                                <DataGridTextColumn Header="LAST" Binding="{Binding LastDisplay}" Width="60"/>
+                                                <DataGridTextColumn Header="TOKENS" Binding="{Binding TokenDisplay}" Width="80"/>
+                                                <DataGridTextColumn Header="MODEL" Binding="{Binding Model}" Width="100">
+                                                    <DataGridTextColumn.ElementStyle>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                                        </Style>
+                                                    </DataGridTextColumn.ElementStyle>
+                                                </DataGridTextColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <!-- ── USAGE PATTERN — LAST 12H ── -->
+                            <Border Grid.Row="4" Style="{StaticResource Card}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                                        <TextBlock Text="USAGE PATTERN — LAST 12H" Style="{StaticResource Sec}"/>
+                                        <TextBlock x:Name="CodexPatternMeta" Text=""
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TxtSubBrush}"
+                                                   HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <ItemsControl Grid.Row="1" x:Name="CodexPatternBars" Height="80">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1" Columns="12"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="3,0">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Border Grid.Row="0" CornerRadius="2"
+                                                            Background="{StaticResource StatusGoodBrush}"
+                                                            VerticalAlignment="Bottom"
+                                                            Height="{Binding BarHeight}"
+                                                            Opacity="0.85"/>
+                                                    <TextBlock Grid.Row="1" Text="{Binding Label}"
+                                                               FontSize="9"
+                                                               Foreground="{StaticResource TxtSubBrush}"
+                                                               HorizontalAlignment="Center"
+                                                               Margin="0,4,0,0"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
+
+                            <!-- ── MODEL BREAKDOWN (보조) ── -->
+                            <Border Grid.Row="6" Style="{StaticResource Card}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>

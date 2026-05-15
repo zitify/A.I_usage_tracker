@@ -1,14 +1,14 @@
 [Setup]
 AppId={{B8F3A2E1-4C5D-6E7F-8A9B-0C1D2E3F4A5B}
 AppName=A.I. Usage Tracker
-AppVersion=2.14.0
-AppVerName=A.I. Usage Tracker 2.14.0
+AppVersion=2.15.0
+AppVerName=A.I. Usage Tracker 2.15.0
 AppPublisher=zitify
 AppPublisherURL=https://zitify.co.kr
 DefaultDirName={autopf}\AI_usage_tracker
 DefaultGroupName=A.I. Usage Tracker
 OutputDir=installer_output
-OutputBaseFilename=AI_usage_tracker_Setup_v2.14.0
+OutputBaseFilename=AI_usage_tracker_Setup_v2.15.0
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern

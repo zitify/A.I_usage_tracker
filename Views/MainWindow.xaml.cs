@@ -2111,10 +2111,89 @@ public partial class MainWindow : Window
         CodexEmptyState.Visibility = Visibility.Collapsed;
         CodexDashboard.Visibility = Visibility.Visible;
         CodexModelGrid.ItemsSource = summary.Models;
+        CodexSessionGrid.ItemsSource = summary.Sessions;
         CodexSessionsCount.Text = summary.SessionsTotal.ToString("N0");
-        CodexInputTokens.Text = summary.InputTotal.ToString("N0");
-        CodexOutputTokens.Text = summary.OutputTotal.ToString("N0");
-        CodexEstCost.Text = $"${summary.CostTotal:F4}";
+        CodexInputTokens.Text = FormatTokensShort(summary.InputTotal);
+        CodexOutputTokens.Text = FormatTokensShort(summary.OutputTotal);
+        CodexEstCost.Text = $"${summary.CostTotal:F2}";
+
+        // LOCAL USAGE
+        CodexLocalToday.Text = FormatTokensShort(summary.TodayTokens);
+        CodexLocalAvg.Text = FormatTokensShort(summary.Last7dAvgTokens);
+        var (deltaText, deltaBrush) = ComputeDelta(summary.TodayTokens, summary.Last7dAvgTokens);
+        CodexLocalDelta.Text = deltaText;
+        CodexLocalDelta.Foreground = deltaBrush;
+        UpdateLocalUsageBar(summary.TodayTokens, summary.Last7dAvgTokens);
+
+        // USAGE PATTERN — LAST 12H
+        UpdateUsagePattern(summary.HourlyTokens);
+    }
+
+    private static string FormatTokensShort(long n)
+    {
+        if (n >= 1_000_000) return $"{n / 1_000_000.0:F1}M";
+        if (n >= 1_000)      return $"{n / 1_000.0:F0}k";
+        return n.ToString("N0");
+    }
+
+    private (string text, System.Windows.Media.Brush brush) ComputeDelta(long today, long avg)
+    {
+        if (avg <= 0) return ("—", (System.Windows.Media.Brush)FindResource("TxtSubBrush"));
+        var pct = (today - avg) * 100.0 / avg;
+        var sign = pct >= 0 ? "▲" : "▼";
+        var brushKey = pct >= 0 ? "StatusWarnBrush" : "StatusGoodBrush";
+        return ($"{sign} {Math.Abs(pct):F0}%", (System.Windows.Media.Brush)FindResource(brushKey));
+    }
+
+    private void UpdateLocalUsageBar(long today, long avg)
+    {
+        if (CodexLocalBar == null) return;
+        double pct;
+        if (avg <= 0) pct = today > 0 ? 1.0 : 0.0;
+        else pct = Math.Min(1.5, today / (double)avg);
+
+        // 색 임계값: <50% good, 50-75 warn, 75-90 high, >90 bad
+        string brushKey = pct switch
+        {
+            < 0.5  => "StatusGoodBrush",
+            < 0.75 => "StatusWarnBrush",
+            < 0.9  => "StatusHighBrush",
+            _       => "StatusBadBrush"
+        };
+        CodexLocalBar.Background = (System.Windows.Media.Brush)FindResource(brushKey);
+
+        var trackWidth = CodexLocalBar.Parent is FrameworkElement parent ? parent.ActualWidth : 240.0;
+        if (trackWidth <= 0) trackWidth = 240.0;
+        CodexLocalBar.Width = Math.Min(trackWidth, trackWidth * Math.Min(1.0, pct));
+        CodexLocalPercent.Text = $"{(int)Math.Round(pct * 100)}%";
+    }
+
+    private class CodexBarItem
+    {
+        public string Label { get; set; } = "";
+        public double BarHeight { get; set; }
+    }
+
+    private void UpdateUsagePattern(int[] hourly)
+    {
+        if (CodexPatternBars == null) return;
+        var max = hourly.Length > 0 ? Math.Max(1, hourly.Max()) : 1;
+        var total = hourly.Sum();
+        CodexPatternMeta.Text = total > 0 ? $"합계 {FormatTokensShort(total)}" : "데이터 없음";
+
+        // 라벨: -11h, -9h, -7h, -5h, -3h, -1h … 짝수 시간만 표기
+        var items = new List<CodexBarItem>(12);
+        for (int i = 0; i < 12; i++)
+        {
+            var hoursAgo = 11 - i;
+            var label = hoursAgo % 2 == 0 ? $"-{hoursAgo}h" : "";
+            items.Add(new CodexBarItem
+            {
+                Label = label,
+                BarHeight = Math.Max(2.0, (hourly[i] / (double)max) * 70.0),
+            });
+        }
+        CodexPatternBars.ItemsSource = items;
     }
 
     private void CodexRangeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

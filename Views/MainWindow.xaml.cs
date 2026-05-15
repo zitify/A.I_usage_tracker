@@ -502,6 +502,7 @@ public partial class MainWindow : Window
         if (bar.Parent is not Grid g || g.ActualWidth <= 0) return;
         bar.Width = g.ActualWidth * Math.Clamp(pct, 0, 100) / 100.0;
         bar.Background = UsageColor(pct);
+        bar.ToolTip = $"{pct:F1}% 사용";
     }
 
     // 주간 카드 호환 오버로드 — 라벨이 있고 totalMs는 한 주
@@ -521,16 +522,19 @@ public partial class MainWindow : Window
         var pct = Math.Min(100, elapsed / totalMs * 100);
         var w = canvas.ActualWidth > 0 ? canvas.ActualWidth : 300;
 
-        // 마커의 중심(2px 세로선)을 정확히 pct 위치에 정렬하고, 양 끝 배지가
-        // 캔버스를 넘지 않도록 좌우 클램프. (99% 일 때 배지가 바를 넘어가던 오버플로 수정)
+        // 마커의 세로선(2px) 중심이 정확히 pct 위치에 오도록 정렬.
+        // 배지(라벨 박스)가 캔버스 오른쪽 밖으로 살짝 나가더라도 ClipToBounds=False 이므로 그대로 보임 —
+        // 100% 일 때 라인이 88~95% 위치에 갇혀 보이던 우측 클램프 제거.
         marker.UpdateLayout();
         var halfW = marker.ActualWidth / 2;
-        var center = w * pct / 100.0;
-        var left = center - halfW;
-        if (marker.ActualWidth > 0)
-            left = Math.Max(0, Math.Min(w - marker.ActualWidth, left));
+        var left = w * pct / 100.0 - halfW;
+        // 좌측만 음수 방지 (0% 에서 마커가 캔버스 왼쪽 밖으로 빠지는 것만 막음)
+        if (left < -halfW) left = -halfW;
         Canvas.SetLeft(marker, left);
         if (label != null) label.Text = $"{pct:F0}%";
+
+        // 호버 툴팁 — 정확한 pct + 리셋 잔여 시간
+        marker.ToolTip = $"{pct:F1}% · 리셋 {FmtResetIn(iso)}";
     }
 
     // ────────── Claude Design ──────────
@@ -1213,11 +1217,13 @@ public partial class MainWindow : Window
             var pct = monthCost / totalMonthlyBudget;
             SetRatioBar(HeroMonthBarFill, pct, BudgetColor(pct));
             HeroMonthSub.Text = $"${monthCost:F2} / ${totalMonthlyBudget:F2} ({pct:P0}) · {daysRemaining}d left";
+            HeroMonthBarFill.ToolTip = $"이번 달 ${monthCost:F2} / ${totalMonthlyBudget:F2} · {pct:P1}";
         }
         else
         {
             HeroMonthBarFill.Width = 0;
             HeroMonthSub.Text = $"no budget set · {daysRemaining}d left";
+            HeroMonthBarFill.ToolTip = $"이번 달 ${monthCost:F2} · 예산 미설정";
         }
 
         var avgPerDay = dayOfMonth > 0 ? monthCost / dayOfMonth : 0;
@@ -2471,6 +2477,7 @@ public partial class MainWindow : Window
         if (trackWidth <= 0) trackWidth = 240.0;
         CodexLocalBar.Width = Math.Min(trackWidth, trackWidth * Math.Min(1.0, pct));
         CodexLocalPercent.Text = $"{(int)Math.Round(pct * 100)}%";
+        CodexLocalBar.ToolTip = $"오늘 {FormatTokensShort(today)} · 7일 평균 {FormatTokensShort(avg)} · {pct:P1}";
     }
 
     private int[] _codexHourlyCache = new int[12];
@@ -2848,6 +2855,7 @@ internal class GeminiBudgetRow
     public SolidColorBrush BarBrush { get; }
     public double BarWidth { get; }
     public string SubText { get; }
+    public string Tooltip { get; }
 
     public GeminiBudgetRow(GeminiAccount a, double todayCost, double monthCost, double barMaxPx)
     {
@@ -2873,6 +2881,10 @@ internal class GeminiBudgetRow
         }
         BarBrush = PickBrush(pct);
         BarWidth = Math.Max(0, Math.Min(1.0, pct)) * barMaxPx;
+        Tooltip = $"{a.Alias} · 오늘 ${todayCost:F2} · 이번 달 ${monthCost:F2}" +
+                  (a.MonthlyBudgetUsd > 0 ? $" / ${a.MonthlyBudgetUsd:F2} ({pct:P1})"
+                                          : a.DailyBudgetUsd > 0 ? $" · 일 예산 ${a.DailyBudgetUsd:F2} ({pct:P1})"
+                                                                 : " · 예산 미설정");
     }
 
     private static SolidColorBrush PickBrush(double pct) => Services.ThemeBrush.UsageColor(pct);
@@ -2885,6 +2897,7 @@ internal class TopModelRow
     public SolidColorBrush ColorBrush { get; }
     public double BarWidth { get; }
     public string ShareText { get; }
+    public string Tooltip { get; }
 
     public TopModelRow(string model, double cost, double barWidth, double share)
     {
@@ -2892,6 +2905,7 @@ internal class TopModelRow
         CostText = $"${cost:F2}";
         BarWidth = Math.Max(0, barWidth);
         ShareText = $"{share:P0}";
+        Tooltip = $"{model} · ${cost:F2} · 전체 대비 {share:P1}";
         var m = (model ?? "").ToLowerInvariant();
         Color c = m.Contains("flash")
             ? Color.FromRgb(0x4F, 0x7C, 0xE8)

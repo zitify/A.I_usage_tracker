@@ -531,7 +531,7 @@
                             <ItemsControl Grid.Row="1" x:Name="GeminiBudgetsList">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="0,0,0,10">
+                                        <Grid Margin="0,0,0,10" ToolTip="{Binding Tooltip}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
@@ -640,7 +640,7 @@
                             <ItemsControl Grid.Row="1" x:Name="TopModelsList">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="0,0,0,10">
+                                        <Grid Margin="0,0,0,10" ToolTip="{Binding Tooltip}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>

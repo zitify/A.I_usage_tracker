@@ -10,10 +10,10 @@
     <AssemblyName>AI_usage_tracker</AssemblyName>
     <RootNamespace>AIUsageTracker</RootNamespace>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>2.18.3</Version>
-    <AssemblyVersion>2.18.3.0</AssemblyVersion>
-    <FileVersion>2.18.3.0</FileVersion>
-    <InformationalVersion>2.18.3</InformationalVersion>
+    <Version>2.18.4</Version>
+    <AssemblyVersion>2.18.4.0</AssemblyVersion>
+    <FileVersion>2.18.4.0</FileVersion>
+    <InformationalVersion>2.18.4</InformationalVersion>
     <!-- 사용자 PC에 정확히 일치하는 .NET 8 Desktop Runtime 이 없으면 매번 설치 프롬프트가
          뜨는 문제가 있어 self-contained 가 기본. publish 시 항상 런타임 동봉. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>

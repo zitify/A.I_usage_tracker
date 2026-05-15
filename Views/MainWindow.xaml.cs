@@ -522,11 +522,15 @@ public partial class MainWindow : Window
         var pct = Math.Min(100, elapsed / totalMs * 100);
         var w = canvas.ActualWidth > 0 ? canvas.ActualWidth : 300;
 
-        // 마커 Grid 의 중심(2px 세로선)이 정확히 pct 위치에 오도록 정렬.
-        // 100% 일 때 라인이 ~88~95% 위치에 갇혀 보이던 우측 클램프는 제거.
+        // 막대는 CornerRadius=5 로 좌우 끝이 둥글게 깎여 있어 0%/100% 위치는
+        // 캔버스 절대 좌표가 아니라 둥근 모서리 안쪽 [R, w-R] 으로 인셋해야
+        // 라인이 막대 시각적 양 끝과 정렬됨.
+        const double R = 5.0;
+        var usableW = Math.Max(0, w - 2 * R);
+        var lineX = R + usableW * pct / 100.0;
+
         marker.UpdateLayout();
         var halfW = marker.ActualWidth / 2;
-        var lineX = w * pct / 100.0;
         var left = lineX - halfW;
         if (left < -halfW) left = -halfW;          // 좌측 음수만 방지
         Canvas.SetLeft(marker, left);

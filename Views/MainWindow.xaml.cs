@@ -254,7 +254,9 @@ public partial class MainWindow : Window
         if (info != null)
         {
             _pendingUpdate = info;
+            _checkUpdateBtnIsDownloadable = true;
             UpdateBtn.Visibility = Visibility.Visible;
+            SetCheckUpdateBtnText($"📥 v{info.Version} 다운로드");
             App.ShowBalloon("업데이트 알림", $"새 버전 v{info.Version}이 있습니다!");
         }
     }
@@ -813,25 +815,82 @@ public partial class MainWindow : Window
         catch (Exception ex) { Logger.Warn("OpenClaudeBtn_Click failed", ex); }
     }
 
+    private bool _checkUpdateBtnIsDownloadable;
+
+    private void SetCheckUpdateBtnText(string text)
+    {
+        if (CheckUpdateBtn.Template.FindName("CheckUpdateBtnText", CheckUpdateBtn) is TextBlock tb)
+            tb.Text = text;
+    }
+
+    private void SetCheckUpdateBtnProgress(int pct)
+    {
+        if (CheckUpdateBtn.Template.FindName("ProgressFill", CheckUpdateBtn) is Border fill)
+        {
+            var w = CheckUpdateBtn.ActualWidth;
+            if (w <= 0) return;
+            fill.Width = w * Math.Clamp(pct, 0, 100) / 100.0;
+        }
+    }
+
     private async void CheckUpdateBtn_Click(object sender, RoutedEventArgs e)
     {
+        // 2번째 클릭 — 이미 발견한 업데이트를 다운로드
+        if (_checkUpdateBtnIsDownloadable && _pendingUpdate != null)
+        {
+            await DownloadPendingUpdateAsync(_pendingUpdate);
+            return;
+        }
+
         CheckUpdateBtn.IsEnabled = false;
-        CheckUpdateBtn.Content = "🔄 확인 중...";
+        SetCheckUpdateBtnText("🔄 확인 중...");
 
         var info = await _update.CheckForUpdateAsync();
         if (info != null)
         {
             _pendingUpdate = info;
+            _checkUpdateBtnIsDownloadable = true;
             UpdateBtn.Visibility = Visibility.Visible;
-            CheckUpdateBtn.Content = $"🔄 v{info.Version} 발견!";
+            SetCheckUpdateBtnText($"📥 v{info.Version} 다운로드");
         }
         else
         {
-            CheckUpdateBtn.Content = "✓ 최신 버전";
+            SetCheckUpdateBtnText("✓ 최신 버전");
             await Task.Delay(2000);
-            CheckUpdateBtn.Content = "🔄 Update";
+            SetCheckUpdateBtnText("🔄 업데이트");
         }
         CheckUpdateBtn.IsEnabled = true;
+    }
+
+    private async Task DownloadPendingUpdateAsync(UpdateInfo info)
+    {
+        CheckUpdateBtn.IsEnabled = false;
+        SetCheckUpdateBtnText($"다운로드 중... 0%");
+        SetCheckUpdateBtnProgress(0);
+
+        var success = await _update.DownloadAndInstallAsync(info, pct =>
+        {
+            Dispatcher.Invoke(() =>
+            {
+                SetCheckUpdateBtnText($"다운로드 중... {pct}%");
+                SetCheckUpdateBtnProgress(pct);
+            });
+        });
+
+        if (success)
+        {
+            SetCheckUpdateBtnText("설치 실행됨, 앱 종료 중...");
+            SetCheckUpdateBtnProgress(100);
+            await Task.Delay(1500);
+            _reallyClosing = true;
+            System.Windows.Application.Current.Shutdown();
+        }
+        else
+        {
+            SetCheckUpdateBtnText("✗ 다운로드 실패 — 재시도");
+            SetCheckUpdateBtnProgress(0);
+            CheckUpdateBtn.IsEnabled = true;
+        }
     }
 
     private void AppIconSettingsBtn_Click(object sender, RoutedEventArgs e)
